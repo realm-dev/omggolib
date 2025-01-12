@@ -11,4 +11,5 @@ type WithdrawalRequest struct {
 	WalletPublicKey string
 	Timestamp       int64
 	Status          WithdrawalStatus
+	Lamports        int64
 }

@@ -1,9 +1,9 @@
 package db
 
 import (
-	"github.com/realm-dev/omggolib/src/internal/model"
 	"context"
 	"fmt"
+	"github.com/realm-dev/omggolib/src/model"
 	"os"
 )
 

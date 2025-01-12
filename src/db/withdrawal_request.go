@@ -1,9 +1,9 @@
 package db
 
 import (
-	"github.com/realm-dev/omggolib/src/internal/model"
 	"context"
 	"fmt"
+	"github.com/realm-dev/omggolib/src/model"
 	"os"
 )
 
@@ -46,4 +46,22 @@ func (client *PostgresDb) GetWithdrawalRequest(accountId int64, status model.Wit
 		}
 	}
 	return nil, err
+}
+
+func (client *PostgresDb) GetWithdrawalRequests(status model.WithdrawalStatus) ([]model.WithdrawalRequest, error) {
+	var result []model.WithdrawalRequest
+
+	rows, err := client.dbpool.Query(context.Background(),
+		"SELECT account_id, wallet_public_key, timestamp, status, lamports FROM withdrawal_requests WHERE status = $1", int(status))
+
+	defer rows.Close()
+
+	if err == nil {
+		for rows.Next() {
+			var request model.WithdrawalRequest
+			err = rows.Scan(&request.AccountId, &request.WalletPublicKey, &request.Timestamp, &request.Status, &request.Lamports)
+			result = append(result, request)
+		}
+	}
+	return result, err
 }
