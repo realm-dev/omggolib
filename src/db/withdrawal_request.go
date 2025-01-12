@@ -34,7 +34,7 @@ func (client *PostgresDb) SetNewWithdrawalRequestTimestamp(accountId int64, stat
 
 func (client *PostgresDb) GetWithdrawalRequest(accountId int64, status model.WithdrawalStatus) (*model.WithdrawalRequest, error) {
 	rows, err := client.dbpool.Query(context.Background(),
-		"SELECT account_id, wallet_public_key, timestamp, status, calculated_lamports, paid_lamports"+
+		"SELECT account_id, wallet_public_key, timestamp, status, lamports, hash"+
 			" FROM withdrawal_requests WHERE account_id = $1 AND status = $2", accountId, int(status))
 
 	defer rows.Close()
@@ -43,7 +43,7 @@ func (client *PostgresDb) GetWithdrawalRequest(accountId int64, status model.Wit
 		for rows.Next() {
 			var request model.WithdrawalRequest
 			err = rows.Scan(&request.AccountId, &request.WalletPublicKey, &request.Timestamp, &request.Status,
-				&request.CalculatedLamports, &request.PaidLamports)
+				&request.Lamports, &request.Hash)
 			return &request, nil
 		}
 	}
@@ -54,7 +54,7 @@ func (client *PostgresDb) GetWithdrawalRequests(status model.WithdrawalStatus) (
 	var result []model.WithdrawalRequest
 
 	rows, err := client.dbpool.Query(context.Background(),
-		"SELECT account_id, wallet_public_key, timestamp, status, calculated_lamports, paid_lamports "+
+		"SELECT account_id, wallet_public_key, timestamp, status, lamports, hash "+
 			"FROM withdrawal_requests WHERE status = $1", int(status))
 
 	defer rows.Close()
@@ -63,7 +63,7 @@ func (client *PostgresDb) GetWithdrawalRequests(status model.WithdrawalStatus) (
 		for rows.Next() {
 			var request model.WithdrawalRequest
 			err = rows.Scan(&request.AccountId, &request.WalletPublicKey, &request.Timestamp, &request.Status,
-				&request.CalculatedLamports, &request.PaidLamports)
+				&request.Lamports, &request.Hash)
 			result = append(result, request)
 		}
 	}
@@ -72,17 +72,16 @@ func (client *PostgresDb) GetWithdrawalRequests(status model.WithdrawalStatus) (
 
 func (client *PostgresDb) SetWithdrawalCalculatedLamports(accountId int64, lamports int64) error {
 	_, err := client.dbpool.Exec(context.Background(),
-		"UPDATE withdrawal_requests SET calculated_lamports = $1 WHERE account_id = $2 and status = $3",
+		"UPDATE withdrawal_requests SET lamports = $1 WHERE account_id = $2 and status = $3",
 		lamports, accountId, int(model.WS_Requested))
 
 	return err
 }
 
-func (client *PostgresDb) SetWithdrawalPaidLamports(accountId int64, lamports int64) error {
+func (client *PostgresDb) SetWithdrawalResult(accountId int64, hash string) error {
 	_, err := client.dbpool.Exec(context.Background(),
-		"UPDATE withdrawal_requests SET paid_lamports = $1, status = $2 WHERE account_id = $3 and status = $4",
-		lamports, int(model.WS_PaidOut), accountId, int(model.WS_Requested))
+		"UPDATE withdrawal_requests SET hash = $1, status = $2 WHERE account_id = $3 and status = $4",
+		hash, int(model.WS_PaidOut), accountId, int(model.WS_Requested))
 
 	return err
-
 }

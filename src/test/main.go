@@ -33,9 +33,9 @@ func main() {
 			log.Panic().Msgf("Cannot get withdrawal request for account: %d, error: %v", preparedRequest.AccountId, err)
 			return
 		}
-		log.Info().Msgf("calculated %d lamports for accountId: %d", preparedRequest.CalculatedLamports, preparedRequest.AccountId)
+		log.Info().Msgf("calculated %d lamports for accountId: %d", preparedRequest.Lamports, preparedRequest.AccountId)
 
-		err = postgres.SetWithdrawalPaidLamports(request.AccountId, 200)
+		err = postgres.SetWithdrawalResult(request.AccountId, "213234j2k3kj43543u3")
 		if err != nil {
 			log.Panic().Msgf("Cannot set paid lamports to withdrawal request account: %d, error: %v", request.AccountId, err)
 			return
@@ -46,7 +46,7 @@ func main() {
 			log.Panic().Msgf("Cannot get withdrawal request for account: %d, error: %v", completedRequest.AccountId, err)
 			return
 		}
-		log.Info().Msgf("withdrawal request completed for accountId: %d, paid lamports: %d", completedRequest.AccountId, completedRequest.PaidLamports)
+		log.Info().Msgf("withdrawal request completed for accountId: %d, paid lamports: %d", completedRequest.AccountId, completedRequest.Lamports)
 
 	}
 

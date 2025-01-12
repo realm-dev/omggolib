@@ -8,10 +8,10 @@ const (
 )
 
 type WithdrawalRequest struct {
-	AccountId          int64
-	WalletPublicKey    string
-	Timestamp          int64
-	Status             WithdrawalStatus
-	CalculatedLamports int64
-	PaidLamports       int64
+	AccountId       int64
+	WalletPublicKey string
+	Timestamp       int64
+	Status          WithdrawalStatus
+	Lamports        int64
+	Hash            string
 }
