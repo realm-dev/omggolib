@@ -3,16 +3,21 @@ package model
 type CommissionStatus int32
 
 const (
-	Paid CommissionStatus = iota
-	Paidback
+	CS_Paid CommissionStatus = iota
+	CS_Paidback
 )
 
 type OperationType int32
 
 const (
-	Buy OperationType = iota
-	Sell
+	OT_Buy OperationType = iota
+	OT_Sell
 )
+
+type PaybackCommission struct {
+	Hash      string
+	Lamportds int64
+}
 
 type Commission struct {
 	Hash                 string

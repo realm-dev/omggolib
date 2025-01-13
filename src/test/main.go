@@ -13,6 +13,13 @@ func main() {
 	postgres := db.NewPostgresDb(DATABASE_URL)
 	defer postgres.Close()
 
+	transactions, err := postgres.GetPaybackCommissions(99999, model.CS_Paid)
+	log.Info().Msgf("found %d transactions", len(transactions))
+	if err != nil {
+		log.Panic().Msgf("Cannot cannot get payback commissions for account: %d, error: %v", 99999, err)
+		return
+	}
+
 	newRequests, err := postgres.GetWithdrawalRequests(model.WS_Requested)
 	if err != nil {
 		log.Panic().Msgf("Cannot get withdrawal requests: %v", err)
@@ -22,7 +29,7 @@ func main() {
 	for _, request := range newRequests {
 		log.Info().Msgf("accountId: %d, status: %d", request.AccountId, request.Status)
 
-		err := postgres.SetWithdrawalCalculatedLamports(request.AccountId, 100)
+		err = postgres.SetWithdrawalCalculatedLamports(request.AccountId, 100)
 		if err != nil {
 			log.Panic().Msgf("Cannot set calculated lamports to withdrawal request account: %d, error: %v", request.AccountId, err)
 			return

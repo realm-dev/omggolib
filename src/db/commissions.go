@@ -52,6 +52,28 @@ func (client *PostgresDb) GetCommission(accountId int64, status int32) ([]model.
 	return commissions, nil
 }
 
+func (client *PostgresDb) GetPaybackCommissions(accountId int64, status model.CommissionStatus) ([]model.PaybackCommission, error) {
+	var commissions []model.PaybackCommission
+
+	rows, err := client.dbpool.Query(context.Background(),
+		"SELECT hash, round(paid_lamports * ref_account_commission / 100.0) as commission "+
+			"FROM commissions WHERE account_id = $1 AND status = $2", accountId, int32(status))
+	if err != nil {
+		return commissions, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var commission model.PaybackCommission
+		if err := rows.Scan(&commission.Hash, &commission.Lamportds); err != nil {
+			return commissions, err
+		}
+		commissions = append(commissions, commission)
+	}
+	return commissions, nil
+}
+
 func (client *PostgresDb) GetTotalCommission(accountId int64, status model.CommissionStatus) (int64, error) {
 	var sum int64 = 0
 	query := fmt.Sprintf("SELECT round(sum(paid_lamports * ref_account_commission / 100.0)) as commission "+
