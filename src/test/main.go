@@ -13,11 +13,32 @@ func main() {
 	postgres := db.NewPostgresDb(DATABASE_URL)
 	defer postgres.Close()
 
-	transactions, err := postgres.GetPaybackCommissions(99999, model.CS_Paid)
-	log.Info().Msgf("found %d transactions", len(transactions))
+	commissions, err := postgres.GetPaybackCommissions(99999, model.CS_Paid)
+	log.Info().Msgf("found %d transactions", len(commissions))
 	if err != nil {
 		log.Panic().Msgf("Cannot cannot get payback commissions for account: %d, error: %v", 99999, err)
 		return
+	}
+
+	for _, commission := range commissions {
+		err = postgres.UpdateCommissionStatus(commission.Hash, model.CS_Paidback)
+		if err != nil {
+			log.Panic().Msgf("Cannot update commission for account: %d, error: %v", 99999, err)
+			return
+		}
+
+		updatedCommission, err := postgres.GetCommission(commission.Hash)
+		if err != nil || updatedCommission == nil {
+			log.Panic().Msgf("failed to get commission status: %v", err)
+			return
+		}
+
+		log.Info().Msgf("new commission status %d", updatedCommission.Status)
+		err = postgres.UpdateCommissionStatus(commission.Hash, model.CS_Paid)
+		if err != nil {
+			log.Panic().Msgf("Cannot cannot get payback commissions for account: %d, error: %v", 99999, err)
+			return
+		}
 	}
 
 	newRequests, err := postgres.GetWithdrawalRequests(model.WS_Requested)

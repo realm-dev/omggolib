@@ -27,13 +27,38 @@ func (client *PostgresDb) InsertCommission(commission model.Commission) error {
 	return nil
 }
 
-func (client *PostgresDb) GetCommission(accountId int64, status int32) ([]model.Commission, error) {
+func (client *PostgresDb) GetCommission(hash string) (*model.Commission, error) {
+	query := fmt.Sprintf("SELECT "+
+		"hash, account_id, ref_account_commission, paid_lamports, timestamp, status, account_public_key, account_fee_public_key, "+
+		"token_public_key, mcap, operation_type, volume_sol "+
+		"FROM commissions WHERE hash = '%s'", hash)
+
+	rows, err := client.dbpool.Query(context.Background(), query)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var commission model.Commission
+		if err := rows.Scan(&commission.Hash, &commission.AccountId, &commission.RefAccountCommission, &commission.PaidLamports,
+			&commission.Timestamp, &commission.Status, &commission.AccountPublicKey, &commission.AccountFeePublicKey,
+			&commission.TokenPublicKey, &commission.MCap, &commission.OperationType, &commission.VolumeSol); err != nil {
+			return nil, err
+		}
+		return &commission, nil
+	}
+	return nil, nil
+}
+
+func (client *PostgresDb) GetCommissions(accountId int64, status int32) ([]model.Commission, error) {
 	var commissions []model.Commission
 
 	rows, err := client.dbpool.Query(context.Background(),
 		"SELECT "+
 			"hash, account_id, ref_account_commission, paid_lamports, timestamp, status, account_public_key, account_fee_public_key, "+
-			"token_public_key, mcap, operation_type, volume_sol"+
+			"token_public_key, mcap, operation_type, volume_sol "+
 			"FROM commissions WHERE account_id = $1 AND status = $2", accountId, status)
 	if err != nil {
 		return commissions, err
@@ -44,7 +69,8 @@ func (client *PostgresDb) GetCommission(accountId int64, status int32) ([]model.
 	for rows.Next() {
 		var commission model.Commission
 		if err := rows.Scan(&commission.Hash, &commission.AccountId, &commission.RefAccountCommission, &commission.PaidLamports,
-			&commission.Timestamp, &commission.Status, &commission.AccountPublicKey, &commission.AccountFeePublicKey); err != nil {
+			&commission.Timestamp, &commission.Status, &commission.AccountPublicKey, &commission.AccountFeePublicKey,
+			&commission.TokenPublicKey, &commission.MCap, &commission.OperationType, &commission.VolumeSol); err != nil {
 			return commissions, err
 		}
 		commissions = append(commissions, commission)
@@ -98,4 +124,11 @@ func (client *PostgresDb) GetLastMCap(accountPublicKey string, tokenPublicKey st
 
 	err := client.dbpool.QueryRow(context.Background(), query).Scan(&mcap)
 	return mcap, err
+}
+
+func (client *PostgresDb) UpdateCommissionStatus(hash string, status model.CommissionStatus) error {
+	query := fmt.Sprintf("UPDATE commissions SET status = %d WHERE hash = '%s'", int(status), hash)
+	_, err := client.dbpool.Exec(context.Background(), query)
+
+	return err
 }
