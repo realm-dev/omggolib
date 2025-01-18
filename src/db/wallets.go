@@ -79,3 +79,19 @@ func (client *PostgresDb) GetWallets(accountId int64) ([]model.Wallet, error) {
 
 	return wallets, err
 }
+
+func (client *PostgresDb) GetWalletByPublickKey(publicKey string) (*model.Wallet, error) {
+	query := fmt.Sprintf("SELECT public_key, account_id, secret_key, is_primary FROM wallets WHERE public_key = '%s'", publicKey)
+	rows, err := client.dbpool.Query(context.Background(), query)
+
+	defer rows.Close()
+
+	if err == nil {
+		for rows.Next() {
+			var primaryWallet model.Wallet
+			err = rows.Scan(&primaryWallet.PublicKey, &primaryWallet.AccountId, &primaryWallet.SecretKey, &primaryWallet.IsPrimary)
+			return &primaryWallet, nil
+		}
+	}
+	return nil, err
+}
