@@ -63,7 +63,7 @@ func (client *PostgresDb) GetWallets(accountId int64) ([]model.Wallet, error) {
 	var wallets []model.Wallet
 
 	rows, err := client.dbpool.Query(context.Background(),
-		"SELECT public_key, account_id, secret_key, is_primary, timestamp FROM wallets WHERE account_id = $1 ORDER BY public_key, timestamp ASC", accountId)
+		"SELECT public_key, account_id, secret_key, is_primary, timestamp FROM wallets WHERE account_id = $1 ORDER BY timestamp ASC", accountId)
 
 	defer rows.Close()
 
