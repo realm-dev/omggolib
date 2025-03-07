@@ -22,4 +22,5 @@ type Account struct {
 	Slippage           uint32
 	PriorityFee        float64
 	Username           string
+	ChatId             int64
 }
