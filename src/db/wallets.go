@@ -70,7 +70,7 @@ func (client *PostgresDb) GetWallets(accountId int64) ([]model.Wallet, error) {
 	if err == nil {
 		for rows.Next() {
 			var wallet model.Wallet
-			if err = rows.Scan(&wallet.PublicKey, &wallet.AccountId, &wallet.SecretKey, &wallet.IsPrimary, wallet.Timestamp); err != nil {
+			if err = rows.Scan(&wallet.PublicKey, &wallet.AccountId, &wallet.SecretKey, &wallet.IsPrimary, &wallet.Timestamp); err != nil {
 				return wallets, err
 			}
 			wallets = append(wallets, wallet)
