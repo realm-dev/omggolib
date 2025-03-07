@@ -8,8 +8,8 @@ import (
 )
 
 func (client *PostgresDb) InsertWallet(wallet model.Wallet) error {
-	commandTag, err := client.dbpool.Exec(context.Background(), "INSERT INTO wallets (public_key, account_id, secret_key, is_primary) VALUES ($1, $2, $3, $4)",
-		wallet.PublicKey, wallet.AccountId, wallet.SecretKey, wallet.IsPrimary)
+	commandTag, err := client.dbpool.Exec(context.Background(), "INSERT INTO wallets (public_key, account_id, secret_key, is_primary, timestamp) VALUES ($1, $2, $3, $4, $5)",
+		wallet.PublicKey, wallet.AccountId, wallet.SecretKey, wallet.IsPrimary, wallet.Timestamp)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Exec failed: %v\n", err)
 		return err
@@ -45,14 +45,14 @@ func (client *PostgresDb) SetPrimaryKey(accountId int64, newPrimaryPublicKey str
 
 func (client *PostgresDb) GetPrimaryWallet(accountId int64) (*model.Wallet, error) {
 	rows, err := client.dbpool.Query(context.Background(),
-		"SELECT public_key, account_id, secret_key, is_primary FROM wallets WHERE account_id = $1 AND is_primary = TRUE", accountId)
+		"SELECT public_key, account_id, secret_key, is_primary, timestamp FROM wallets WHERE account_id = $1 AND is_primary = TRUE", accountId)
 
 	defer rows.Close()
 
 	if err == nil {
 		for rows.Next() {
 			var primaryWallet model.Wallet
-			err = rows.Scan(&primaryWallet.PublicKey, &primaryWallet.AccountId, &primaryWallet.SecretKey, &primaryWallet.IsPrimary)
+			err = rows.Scan(&primaryWallet.PublicKey, &primaryWallet.AccountId, &primaryWallet.SecretKey, &primaryWallet.IsPrimary, &primaryWallet.Timestamp)
 			return &primaryWallet, nil
 		}
 	}
@@ -63,14 +63,14 @@ func (client *PostgresDb) GetWallets(accountId int64) ([]model.Wallet, error) {
 	var wallets []model.Wallet
 
 	rows, err := client.dbpool.Query(context.Background(),
-		"SELECT public_key, account_id, secret_key, is_primary FROM wallets WHERE account_id = $1 ORDER BY public_key ASC", accountId)
+		"SELECT public_key, account_id, secret_key, is_primary, timestamp FROM wallets WHERE account_id = $1 ORDER BY public_key, timestamp ASC", accountId)
 
 	defer rows.Close()
 
 	if err == nil {
 		for rows.Next() {
 			var wallet model.Wallet
-			if err = rows.Scan(&wallet.PublicKey, &wallet.AccountId, &wallet.SecretKey, &wallet.IsPrimary); err != nil {
+			if err = rows.Scan(&wallet.PublicKey, &wallet.AccountId, &wallet.SecretKey, &wallet.IsPrimary, wallet.Timestamp); err != nil {
 				return wallets, err
 			}
 			wallets = append(wallets, wallet)
@@ -81,7 +81,7 @@ func (client *PostgresDb) GetWallets(accountId int64) ([]model.Wallet, error) {
 }
 
 func (client *PostgresDb) GetWalletByPublickKey(publicKey string) (*model.Wallet, error) {
-	query := fmt.Sprintf("SELECT public_key, account_id, secret_key, is_primary FROM wallets WHERE public_key = '%s'", publicKey)
+	query := fmt.Sprintf("SELECT public_key, account_id, secret_key, is_primary, timestamp FROM wallets WHERE public_key = '%s'", publicKey)
 	rows, err := client.dbpool.Query(context.Background(), query)
 
 	defer rows.Close()
@@ -89,7 +89,7 @@ func (client *PostgresDb) GetWalletByPublickKey(publicKey string) (*model.Wallet
 	if err == nil {
 		for rows.Next() {
 			var primaryWallet model.Wallet
-			err = rows.Scan(&primaryWallet.PublicKey, &primaryWallet.AccountId, &primaryWallet.SecretKey, &primaryWallet.IsPrimary)
+			err = rows.Scan(&primaryWallet.PublicKey, &primaryWallet.AccountId, &primaryWallet.SecretKey, &primaryWallet.IsPrimary, &primaryWallet.Timestamp)
 			return &primaryWallet, nil
 		}
 	}

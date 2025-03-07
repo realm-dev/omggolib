@@ -5,4 +5,5 @@ type Wallet struct {
 	AccountId int64
 	SecretKey string
 	IsPrimary bool
+	Timestamp int64
 }
