@@ -23,4 +23,5 @@ type Account struct {
 	PriorityFee        float64
 	Username           string
 	ChatId             int64
+	EnableMev          bool
 }
