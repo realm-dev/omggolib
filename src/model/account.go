@@ -1,6 +1,7 @@
 package model
 
 type Role int32
+type Tips int32
 
 const (
 	System Role = iota
@@ -9,6 +10,13 @@ const (
 )
 
 const SystemAccountId = 1
+
+const (
+	TipsNone Tips = iota
+	Tipsx1
+	Tipsx2
+	Tipsx3
+)
 
 type Account struct {
 	AccountId          int64
@@ -23,5 +31,6 @@ type Account struct {
 	PriorityFee        float64
 	Username           string
 	ChatId             int64
-	EnableMev          bool
+	JitoTipsBuy        Tips
+	JitoTipsSell       Tips
 }
