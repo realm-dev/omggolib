@@ -101,10 +101,15 @@ func (client *PostgresDb) GetAccountByAlias(aliasId string) (*model.Account, err
 	return &account, err
 }
 
-func (client *PostgresDb) UpdateAccountJitoTips(account model.Account) error {
-	commandTag, err := client.dbpool.Exec(context.Background(), "UPDATE accounts "+
-		"SET jito_tips_buy=$1, jito_tips_sell=$2 WHERE account_id=$3",
-		account.JitoTipsBuy, account.JitoTipsSell, account.AccountId)
+func (client *PostgresDb) UpdateAccountJitoTips(tips model.Tips, side model.Side, accountId uint64) error {
+	var command string
+	if side == model.Buy {
+		command = "UPDATE accounts SET jito_tips_buy=$1 WHERE account_id=$2"
+	} else {
+		command = "UPDATE accounts SET jito_tips_sell=$1 WHERE account_id=$2"
+	}
+
+	commandTag, err := client.dbpool.Exec(context.Background(), command, tips, accountId)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Exec failed: %v\n", err)
 		return err

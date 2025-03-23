@@ -2,6 +2,7 @@ package model
 
 type Role int32
 type Tips int32
+type Side int32
 
 const (
 	System Role = iota
@@ -16,6 +17,11 @@ const (
 	Tipsx1
 	Tipsx2
 	Tipsx3
+)
+
+const (
+	Buy Side = iota
+	Sell
 )
 
 type Account struct {
