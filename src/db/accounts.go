@@ -100,3 +100,19 @@ func (client *PostgresDb) GetAccountByAlias(aliasId string) (*model.Account, err
 			&account.BuyTokenVolume, &account.SellPercent, &account.Slippage, &account.PriorityFee, &account.Username, &account.ChatId, &account.JitoTipsBuy, account.JitoTipsSell)
 	return &account, err
 }
+
+func (client *PostgresDb) UpdateAccountJitoTips(account model.Account) error {
+	commandTag, err := client.dbpool.Exec(context.Background(), "UPDATE accounts "+
+		"SET jito_tips_buy=$1, jito_tips_sell=$2 WHERE account_id=$3",
+		account.JitoTipsBuy, account.JitoTipsSell, account.AccountId)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Exec failed: %v\n", err)
+		return err
+	}
+
+	if commandTag.RowsAffected() != 1 {
+		fmt.Fprintf(os.Stderr, "Update failed: %v\n", err)
+		return err
+	}
+	return nil
+}
