@@ -32,7 +32,7 @@ func (client *PostgresDb) GetAccount(accountId int64) (*model.Account, error) {
 			"account_id, alias_id, account_role, ref_account_id, affiliate_level, commission_discount, buy_token_volume, sell_percent, slippage, priority_fee, username, chat_id, jito_tips_buy, jito_tips_sell "+
 			"FROM accounts WHERE account_id = $1",
 		accountId).Scan(&account.AccountId, &account.AliasId, &account.AccountRole, &account.RefAccountId, &account.AffiliateLevel, &account.CommissionDiscount,
-		&account.BuyTokenVolume, &account.SellPercent, &account.Slippage, &account.PriorityFee, &account.Username, &account.ChatId, &account.JitoTipsBuy, account.JitoTipsSell)
+		&account.BuyTokenVolume, &account.SellPercent, &account.Slippage, &account.PriorityFee, &account.Username, &account.ChatId, &account.JitoTipsBuy, &account.JitoTipsSell)
 	return &account, err
 }
 
@@ -52,7 +52,7 @@ func (client *PostgresDb) GetAccountsByRef(refAccountId int64) ([]model.Account,
 	for rows.Next() {
 		var account model.Account
 		if err := rows.Scan(&account.AccountId, &account.AliasId, &account.AccountRole, &account.RefAccountId, &account.AffiliateLevel, &account.CommissionDiscount,
-			&account.BuyTokenVolume, &account.SellPercent, &account.Slippage, &account.PriorityFee, &account.Username, &account.ChatId, &account.JitoTipsBuy, account.JitoTipsSell); err != nil {
+			&account.BuyTokenVolume, &account.SellPercent, &account.Slippage, &account.PriorityFee, &account.Username, &account.ChatId, &account.JitoTipsBuy, &account.JitoTipsSell); err != nil {
 			return accounts, err
 		}
 		accounts = append(accounts, account)
@@ -97,11 +97,11 @@ func (client *PostgresDb) GetAccountByAlias(aliasId string) (*model.Account, err
 			"account_id, alias_id, account_role, ref_account_id, affiliate_level, commission_discount, buy_token_volume, sell_percent, slippage, priority_fee, username, chat_id, jito_tips_buy, jito_tips_sell "+
 			"FROM accounts WHERE alias_id = $1", aliasId).
 		Scan(&account.AccountId, &account.AliasId, &account.AccountRole, &account.RefAccountId, &account.AffiliateLevel, &account.CommissionDiscount,
-			&account.BuyTokenVolume, &account.SellPercent, &account.Slippage, &account.PriorityFee, &account.Username, &account.ChatId, &account.JitoTipsBuy, account.JitoTipsSell)
+			&account.BuyTokenVolume, &account.SellPercent, &account.Slippage, &account.PriorityFee, &account.Username, &account.ChatId, &account.JitoTipsBuy, &account.JitoTipsSell)
 	return &account, err
 }
 
-func (client *PostgresDb) UpdateAccountJitoTips(tips model.Tips, side model.Side, accountId uint64) error {
+func (client *PostgresDb) UpdateAccountJitoTips(tips model.Tips, side model.Side, accountId int64) error {
 	var command string
 	if side == model.Buy {
 		command = "UPDATE accounts SET jito_tips_buy=$1 WHERE account_id=$2"
