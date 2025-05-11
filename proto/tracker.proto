@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package tracker;
+
+option go_package = "github.com/realm-dev/omggolib";
+
+service TrackerService {
+	rpc SubscribeTransactions(SubscribeTransactionInfoStreamRequest) returns (stream TransactionInfoResponse);
+	rpc SendTrackedAccountRequest(TrackedAccountRequest) returns (TrackedAccountResponse);
+}
+
+enum Side {
+    Unknown = 0;
+    Buy = 1;
+    Sell = 2;
+}
+
+message SubscribeTransactionInfoStreamRequest {
+}
+
+message TransactionInfo {
+	string Mint = 1;
+	Side TransactionSide = 2;
+	double Amount = 3;
+	double Balance = 4;
+}
+
+message TransactionInfoResponse {
+	string RequestId = 1;
+	string ChatId = 2;
+	TransactionInfo Info = 3;
+}
+
+message TrackedAccountRequest {
+	string RequestId = 1;
+	string ChatId = 2;
+	string Owner = 3;
+	string TrackedAccount = 4;
+}
+
+message TrackedAccountResponse {
+	string RequestId = 1;
+	string ChatId = 2;
+}
+
+
