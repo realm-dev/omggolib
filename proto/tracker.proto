@@ -15,9 +15,20 @@ enum Side {
     Sell = 2;
 }
 
+enum SubscriptionStatus {
+	StatusUnknown = 0;
+	StatusCompleted = 1;
+	StatusProcessing = 2;
+	StatusFailed = 3;
+	StatusTimeout = 4;
+}
+
 enum TrackResult {
-	OK = 0;
-	Error = 1;
+	ResultUnknown = 0;
+	ResultOK = 1;
+	ResultFailed = 2;
+	ResultAlreadySubscribed = 3;
+	ResultWrongWalletPublicKey = 4;
 }
 
 message SubscribeTransactionInfoStreamRequest {
@@ -33,7 +44,8 @@ message TransactionInfo {
 message TransactionInfoResponse {
 	string RequestId = 1;
 	int64 ChatId = 2;
-	TransactionInfo Info = 3;
+	SubscriptionStatus Status = 3;
+	TransactionInfo Info = 4;
 }
 
 message TrackedAccountRequest {
@@ -46,7 +58,7 @@ message TrackedAccountResponse {
 	string RequestId = 1;
 	int64 ChatId = 2;
 	TrackResult Result = 3;
-	optional string ResultMessage = 4;
+	string ResultMessage = 4;
 }
 
 
