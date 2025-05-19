@@ -38,9 +38,8 @@ message TransactionInfoResponse {
 
 message TrackedAccountRequest {
 	string RequestId = 1;
-	string ChatId = 2;
-	string Owner = 3;
-	string TrackedAccount = 4;
+	int64 ChatId = 2;
+	string TrackedAccount = 3;
 }
 
 message TrackedAccountResponse {
