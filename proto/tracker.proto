@@ -39,6 +39,7 @@ message TransactionInfo {
 	Side TransactionSide = 2;
 	double Amount = 3;
 	double Balance = 4;
+	string Hash = 5;
 }
 
 message TransactionInfoResponse {
