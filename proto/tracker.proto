@@ -15,6 +15,11 @@ enum Side {
     Sell = 2;
 }
 
+enum TrackResult {
+	OK = 0;
+	Error = 1;
+}
+
 message SubscribeTransactionInfoStreamRequest {
 }
 
@@ -27,7 +32,7 @@ message TransactionInfo {
 
 message TransactionInfoResponse {
 	string RequestId = 1;
-	string ChatId = 2;
+	int64 ChatId = 2;
 	TransactionInfo Info = 3;
 }
 
@@ -40,7 +45,9 @@ message TrackedAccountRequest {
 
 message TrackedAccountResponse {
 	string RequestId = 1;
-	string ChatId = 2;
+	int64 ChatId = 2;
+	TrackResult Result = 3;
+	optional string ResultMessage = 4;
 }
 
 
