@@ -45,21 +45,22 @@ message TransactionInfo {
 message TransactionInfoResponse {
 	string RequestId = 1;
 	int64 ChatId = 2;
-	SubscriptionStatus Status = 3;
-	TransactionInfo Info = 4;
+	int64 AccountId = 3;
+	SubscriptionStatus Status = 4;
+	TransactionInfo Info = 5;
 }
 
 message TrackedAccountRequest {
 	string RequestId = 1;
 	int64 ChatId = 2;
-	string TrackedAccount = 3;
+	int64 AccountId = 3;
+	string TrackedWallet = 4;
 }
 
 message TrackedAccountResponse {
 	string RequestId = 1;
 	int64 ChatId = 2;
-	TrackResult Result = 3;
-	string ResultMessage = 4;
+	int64 AccountId = 3;
+	TrackResult Result = 4;
+	string ResultMessage = 5;
 }
-
-
