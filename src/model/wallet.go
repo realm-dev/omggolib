@@ -7,3 +7,8 @@ type Wallet struct {
 	IsPrimary bool
 	Timestamp int64
 }
+
+type LuckyWallet struct {
+	Wallet Wallet
+	Hash   string
+}
