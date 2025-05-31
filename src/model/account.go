@@ -39,4 +39,5 @@ type Account struct {
 	ChatId             int64
 	JitoTipsBuy        Tips
 	JitoTipsSell       Tips
+	FreeLuckyKey       bool
 }
