@@ -123,3 +123,18 @@ func (client *PostgresDb) UpdateAccountJitoTips(tips model.Tips, side model.Side
 	}
 	return nil
 }
+
+func (client *PostgresDb) UpdateAccountFreeLuckyKey(accountId int64, isFree bool) error {
+	command := "UPDATE accounts SET free_lucky_key=$1 WHERE account_id=$2"
+	commandTag, err := client.dbpool.Exec(context.Background(), command, isFree, accountId)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Exec failed: %v\n", err)
+		return err
+	}
+
+	if commandTag.RowsAffected() != 1 {
+		fmt.Fprintf(os.Stderr, "Update failed: %v\n", err)
+		return err
+	}
+	return nil
+}
